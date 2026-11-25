@@ -1,0 +1,58 @@
+version: 2
+
+models:
+  - name: int_yellow_taxi_trips
+    description: >
+      Intermediate transformation of NYC Yellow Taxi trips.
+      Preserves all staging records and derives trip duration
+      and data-quality flags for trip time, distance, total
+      amount, and overall record validity.
+
+    columns:
+      - name: trip_duration_minutes
+        description: >
+          Trip duration calculated from dropoff and pickup
+          timestamps in minutes.
+        data_tests:
+          - not_null
+
+      - name: is_valid_trip_time
+        description: >
+          Boolean flag indicating that pickup occurs before
+          dropoff.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [true, false]
+
+      - name: is_valid_trip_distance
+        description: >
+          Boolean flag indicating that trip distance is
+          greater than zero.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [true, false]
+
+      - name: is_nonnegative_total_amount
+        description: >
+          Boolean flag indicating that total amount is
+          greater than or equal to zero.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [true, false]
+
+      - name: is_valid_trip_record
+        description: >
+          Combined flag indicating that trip time, trip
+          distance, and total amount satisfy the current
+          intermediate validation rules.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [true, false]
