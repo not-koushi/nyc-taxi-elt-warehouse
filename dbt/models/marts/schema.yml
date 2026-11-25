@@ -1,0 +1,31 @@
+version: 2
+
+models:
+  - name: dim_taxi_zone
+    description: "Dimension table containing NYC TLC taxi zones and their attributes."
+
+    columns:
+      - name: zone_key
+        description: "Warehouse-generated surrogate key for each taxi zone."
+        tests:
+          - unique
+          - not_null
+
+      - name: location_id
+        description: "Original NYC TLC taxi LocationID."
+        tests:
+          - unique
+          - not_null
+
+      - name: borough
+        description: "Borough or location classification associated with the taxi zone."
+        tests:
+          - not_null
+
+      - name: zone
+        description: "Name of the NYC TLC taxi zone."
+        tests:
+          - not_null
+
+      - name: service_zone
+        description: "NYC TLC service zone classification."

@@ -24,3 +24,13 @@ models:
     marts:
       +materialized: table
       +schema: mart
+
+seeds:
+  nyc_taxi_warehouse:
+    taxi_zone_lookup:
+      +schema: staging
+      +column_types:
+        LocationID: integer
+        Borough: varchar(50)
+        Zone: varchar(100)
+        service_zone: varchar(50)
