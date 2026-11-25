@@ -1,3 +1,4 @@
+
 version: 2
 
 models:
@@ -112,3 +113,50 @@ models:
       - name: is_weekend
         tests:
           - not_null
+
+  - name: fact_trips
+    description: "Fact table containing one record per Yellow Taxi trip with dimensional surrogate keys, trip measures and data quality flags."
+    columns:
+      - name: trip_key
+        description: "Warehouse-generated surrogate key for each trip record."
+        tests:
+          - unique
+          - not_null
+
+      - name: vendor_key
+        description: "Foreign key to dim_vendor."
+
+      - name: pickup_date_key
+        description: "Foreign key to dim_date for the pickup date."
+
+      - name: dropoff_date_key
+        description: "Foreign key to dim_date for the drop-off date."
+
+      - name: pickup_zone_key
+        description: "Foreign key to dim_taxi_zone for the pickup zone."
+
+      - name: dropoff_zone_key
+        description: "Foreign key to dim_taxi_zone for the drop-off zone."
+
+      - name: payment_type_key
+        description: "Foreign key to dim_payment_type."
+
+      - name: rate_code_key
+        description: "Foreign key to dim_rate_code."
+
+      - name: trip_distance
+        description: "Distance travelled in miles."
+
+      - name: trip_duration_minutes
+        description: "Calculated trip duration in minutes."
+
+      - name: total_amount
+        description: "Total trip amount."
+
+      - name: is_valid_trip_record
+        description: "Overall data quality indicator for the trip."
+        tests:
+          - not_null
+          - accepted_values:
+              values: [true, false]
+

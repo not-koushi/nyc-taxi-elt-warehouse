@@ -1,6 +1,8 @@
 WITH rate_codes AS (
 
-    SELECT 1 AS rate_code_id, 'Standard Rate' AS rate_code_name
+    SELECT -1 AS rate_code_id, 'Not Reported' AS rate_code_name
+    UNION ALL
+    SELECT 1, 'Standard Rate'
     UNION ALL
     SELECT 2, 'JFK'
     UNION ALL

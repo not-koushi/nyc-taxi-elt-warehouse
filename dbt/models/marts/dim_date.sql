@@ -1,10 +1,20 @@
 WITH date_bounds AS (
 
     SELECT
-        MIN(pickup_datetime)::DATE AS min_date,
-        MAX(pickup_datetime)::DATE AS max_date
+        MIN(trip_date) AS min_date,
+        MAX(trip_date) AS max_date
 
-    FROM {{ ref('int_yellow_taxi_trips') }}
+    FROM (
+
+        SELECT pickup_datetime::DATE AS trip_date
+        FROM {{ ref('int_yellow_taxi_trips') }}
+
+        UNION ALL
+
+        SELECT dropoff_datetime::DATE AS trip_date
+        FROM {{ ref('int_yellow_taxi_trips') }}
+
+    ) AS all_trip_dates
 
 ),
 
