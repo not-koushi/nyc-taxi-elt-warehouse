@@ -1,0 +1,210 @@
+{
+    "audit_run_id": "ac42bd57-9ae2-40b2-8533-54f3da28309b",
+    "executed_at": "2026-11-25T19:26:07.549718+00:00",
+    "total_checks": 25,
+    "pass": 16,
+    "warn": 9,
+    "fail": 0,
+    "results": [
+        {
+            "audit_run_id": "ac42bd57-9ae2-40b2-8533-54f3da28309b",
+            "check_name": "Q01_fact_row_count",
+            "category": "Completeness",
+            "status": "PASS",
+            "actual_value": 3475226,
+            "expected_value": "Greater than zero"
+        },
+        {
+            "audit_run_id": "ac42bd57-9ae2-40b2-8533-54f3da28309b",
+            "check_name": "Q02_null_pickup_datetime",
+            "category": "Completeness",
+            "status": "PASS",
+            "actual_value": 0,
+            "expected_value": "0"
+        },
+        {
+            "audit_run_id": "ac42bd57-9ae2-40b2-8533-54f3da28309b",
+            "check_name": "Q03_null_dropoff_datetime",
+            "category": "Completeness",
+            "status": "PASS",
+            "actual_value": 0,
+            "expected_value": "0"
+        },
+        {
+            "audit_run_id": "ac42bd57-9ae2-40b2-8533-54f3da28309b",
+            "check_name": "Q04_null_trip_distance",
+            "category": "Completeness",
+            "status": "PASS",
+            "actual_value": 0,
+            "expected_value": "0"
+        },
+        {
+            "audit_run_id": "ac42bd57-9ae2-40b2-8533-54f3da28309b",
+            "check_name": "Q05_null_total_amount",
+            "category": "Completeness",
+            "status": "PASS",
+            "actual_value": 0,
+            "expected_value": "0"
+        },
+        {
+            "audit_run_id": "ac42bd57-9ae2-40b2-8533-54f3da28309b",
+            "check_name": "Q06_null_vendor_keys",
+            "category": "Referential integrity",
+            "status": "PASS",
+            "actual_value": 0,
+            "expected_value": "0"
+        },
+        {
+            "audit_run_id": "ac42bd57-9ae2-40b2-8533-54f3da28309b",
+            "check_name": "Q07_null_pickup_zone_keys",
+            "category": "Referential integrity",
+            "status": "PASS",
+            "actual_value": 0,
+            "expected_value": "0"
+        },
+        {
+            "audit_run_id": "ac42bd57-9ae2-40b2-8533-54f3da28309b",
+            "check_name": "Q08_null_dropoff_zone_keys",
+            "category": "Referential integrity",
+            "status": "PASS",
+            "actual_value": 0,
+            "expected_value": "0"
+        },
+        {
+            "audit_run_id": "ac42bd57-9ae2-40b2-8533-54f3da28309b",
+            "check_name": "Q09_null_payment_keys",
+            "category": "Referential integrity",
+            "status": "PASS",
+            "actual_value": 0,
+            "expected_value": "0"
+        },
+        {
+            "audit_run_id": "ac42bd57-9ae2-40b2-8533-54f3da28309b",
+            "check_name": "Q10_null_rate_code_keys",
+            "category": "Referential integrity",
+            "status": "PASS",
+            "actual_value": 0,
+            "expected_value": "0"
+        },
+        {
+            "audit_run_id": "ac42bd57-9ae2-40b2-8533-54f3da28309b",
+            "check_name": "Q11_duplicate_trip_fingerprints",
+            "category": "Uniqueness",
+            "status": "PASS",
+            "actual_value": "0",
+            "expected_value": "0 duplicate groups"
+        },
+        {
+            "audit_run_id": "ac42bd57-9ae2-40b2-8533-54f3da28309b",
+            "check_name": "Q12_invalid_duration_flag_consistency",
+            "category": "Consistency",
+            "status": "PASS",
+            "actual_value": 0,
+            "expected_value": "0"
+        },
+        {
+            "audit_run_id": "ac42bd57-9ae2-40b2-8533-54f3da28309b",
+            "check_name": "Q13_overall_quality_flag_consistency",
+            "category": "Consistency",
+            "status": "PASS",
+            "actual_value": 0,
+            "expected_value": "0"
+        },
+        {
+            "audit_run_id": "ac42bd57-9ae2-40b2-8533-54f3da28309b",
+            "check_name": "Q14_zero_distance_records",
+            "category": "Validity",
+            "status": "WARN",
+            "actual_value": 90893,
+            "expected_value": "0 for valid trips"
+        },
+        {
+            "audit_run_id": "ac42bd57-9ae2-40b2-8533-54f3da28309b",
+            "check_name": "Q15_negative_total_amount",
+            "category": "Financial validity",
+            "status": "WARN",
+            "actual_value": 63037,
+            "expected_value": "0 for valid trips"
+        },
+        {
+            "audit_run_id": "ac42bd57-9ae2-40b2-8533-54f3da28309b",
+            "check_name": "Q16_negative_fare_amount",
+            "category": "Financial validity",
+            "status": "WARN",
+            "actual_value": 144118,
+            "expected_value": "0 for valid trips"
+        },
+        {
+            "audit_run_id": "ac42bd57-9ae2-40b2-8533-54f3da28309b",
+            "check_name": "Q17_negative_tip_amount",
+            "category": "Financial validity",
+            "status": "WARN",
+            "actual_value": 124,
+            "expected_value": "0 for valid trips"
+        },
+        {
+            "audit_run_id": "ac42bd57-9ae2-40b2-8533-54f3da28309b",
+            "check_name": "Q18_invalid_time_order",
+            "category": "Temporal validity",
+            "status": "WARN",
+            "actual_value": 2051,
+            "expected_value": "0 for valid trips"
+        },
+        {
+            "audit_run_id": "ac42bd57-9ae2-40b2-8533-54f3da28309b",
+            "check_name": "Q19_excessive_trip_duration",
+            "category": "Statistical anomaly",
+            "status": "WARN",
+            "actual_value": 20,
+            "expected_value": "0 trips over 24 hours"
+        },
+        {
+            "audit_run_id": "ac42bd57-9ae2-40b2-8533-54f3da28309b",
+            "check_name": "Q20_excessive_trip_distance",
+            "category": "Statistical anomaly",
+            "status": "WARN",
+            "actual_value": 162,
+            "expected_value": "0 trips over 100 miles"
+        },
+        {
+            "audit_run_id": "ac42bd57-9ae2-40b2-8533-54f3da28309b",
+            "check_name": "Q21_null_passenger_count",
+            "category": "Completeness",
+            "status": "WARN",
+            "actual_value": 540149,
+            "expected_value": "0"
+        },
+        {
+            "audit_run_id": "ac42bd57-9ae2-40b2-8533-54f3da28309b",
+            "check_name": "Q22_null_fare_amount",
+            "category": "Completeness",
+            "status": "PASS",
+            "actual_value": 0,
+            "expected_value": "0"
+        },
+        {
+            "audit_run_id": "ac42bd57-9ae2-40b2-8533-54f3da28309b",
+            "check_name": "Q23_null_tip_amount",
+            "category": "Completeness",
+            "status": "PASS",
+            "actual_value": 0,
+            "expected_value": "0"
+        },
+        {
+            "audit_run_id": "ac42bd57-9ae2-40b2-8533-54f3da28309b",
+            "check_name": "Q24_null_source_file_metadata",
+            "category": "Lineage",
+            "status": "PASS",
+            "actual_value": 0,
+            "expected_value": "0"
+        },
+        {
+            "audit_run_id": "ac42bd57-9ae2-40b2-8533-54f3da28309b",
+            "check_name": "Q25_unmapped_pickup_borough",
+            "category": "Geographic completeness",
+            "status": "WARN",
+            "actual_value": 9521,
+            "expected_value": "Investigate unmapped pickup boroughs"
+        }
+    ]
+}
