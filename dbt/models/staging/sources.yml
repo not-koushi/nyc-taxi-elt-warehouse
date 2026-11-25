@@ -1,0 +1,9 @@
+version: 2
+
+sources:
+  - name: taxi_raw
+    schema: raw
+    description: "Raw NYC TLC Yellow Taxi data loaded by the Python ingestion pipeline."
+    tables:
+      - name: yellow_taxi_trips
+        description: "Raw Yellow Taxi trip records, including ingestion metadata."

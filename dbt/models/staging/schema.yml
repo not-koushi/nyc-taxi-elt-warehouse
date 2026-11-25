@@ -1,0 +1,43 @@
+version: 2
+
+models:
+  - name: stg_yellow_taxi_trips
+    description: "Typed staging view for NYC Yellow Taxi trip records."
+
+    columns:
+      - name: vendor_id
+        description: "Taxi technology provider identifier."
+        data_tests:
+          - not_null
+
+      - name: pickup_datetime
+        description: "Timestamp at which the passenger pickup occurred."
+        data_tests:
+          - not_null
+
+      - name: dropoff_datetime
+        description: "Timestamp at which the passenger dropoff occurred."
+        data_tests:
+          - not_null
+
+      - name: trip_distance
+        description: "Trip distance in miles."
+
+      - name: total_amount
+        description: "Total amount charged to the passenger."
+
+      - name: pickup_location_id
+        description: "TLC pickup taxi zone identifier."
+
+      - name: dropoff_location_id
+        description: "TLC dropoff taxi zone identifier."
+
+      - name: source_file
+        description: "Original source filename."
+        data_tests:
+          - not_null
+
+      - name: batch_id
+        description: "Ingestion batch identifier."
+        data_tests:
+          - not_null
