@@ -32,6 +32,7 @@ temp/
 # Data files
 data/raw/*
 data/processed/*
+data/reference
 
 # Keep directory placeholders
 !data/raw/.gitkeep
