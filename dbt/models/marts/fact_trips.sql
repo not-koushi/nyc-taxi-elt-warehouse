@@ -99,6 +99,9 @@ SELECT
     pickup_date_key,
     dropoff_date_key,
 
+    pickup_datetime,
+    dropoff_datetime,
+
     pickup_zone_key,
     dropoff_zone_key,
 
