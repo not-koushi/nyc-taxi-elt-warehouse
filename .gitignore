@@ -28,3 +28,23 @@ Thumbs.db
 # Temporary files
 tmp/
 temp/
+
+# Data files
+data/raw/*
+data/processed/*
+
+# Keep directory placeholders
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# dbt artifacts
+dbt/target/
+dbt/logs/
+dbt/dbt_packages/
+
+# Airflow
+airflow/logs/
+airflow/plugins/__pycache__/
+
+# Docker
+*.pid

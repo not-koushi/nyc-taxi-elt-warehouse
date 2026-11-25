@@ -1,0 +1,51 @@
+services:
+
+  warehouse:
+    image: postgres:16
+    container_name: taxi_warehouse
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    networks:
+      - taxi_network
+
+
+  metabase:
+    image: metabase/metabase:latest
+    container_name: taxi_metabase
+    restart: unless-stopped
+
+    ports:
+      - "${METABASE_PORT}:3000"
+
+    depends_on:
+      warehouse:
+        condition: service_healthy
+
+    networks:
+      - taxi_network
+
+
+volumes:
+  postgres_data:
+
+
+networks:
+  taxi_network:
+    driver: bridge
