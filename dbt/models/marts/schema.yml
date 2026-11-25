@@ -158,5 +158,5 @@ models:
         tests:
           - not_null
           - accepted_values:
-              values: [true, false]
-
+              arguments:    
+                values: [true, false]
