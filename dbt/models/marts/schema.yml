@@ -3,7 +3,6 @@ version: 2
 models:
   - name: dim_taxi_zone
     description: "Dimension table containing NYC TLC taxi zones and their attributes."
-
     columns:
       - name: zone_key
         description: "Warehouse-generated surrogate key for each taxi zone."
@@ -29,3 +28,87 @@ models:
 
       - name: service_zone
         description: "NYC TLC service zone classification."
+
+  - name: dim_vendor
+    description: "Dimension containing taxi vendor identifiers and descriptions."
+    columns:
+      - name: vendor_key
+        tests:
+          - unique
+          - not_null
+
+      - name: vendor_id
+        tests:
+          - unique
+          - not_null
+
+      - name: vendor_name
+        tests:
+          - not_null
+
+  - name: dim_payment_type
+    description: "Dimension containing taxi payment codes and descriptions."
+    columns:
+      - name: payment_type_key
+        tests:
+          - unique
+          - not_null
+
+      - name: payment_type_id
+        tests:
+          - unique
+          - not_null
+
+      - name: payment_type_name
+        tests:
+          - not_null
+
+  - name: dim_rate_code
+    description: "Dimension containing taxi rate codes and descriptions."
+    columns:
+      - name: rate_code_key
+        tests:
+          - unique
+          - not_null
+
+      - name: rate_code_id
+        tests:
+          - unique
+          - not_null
+
+      - name: rate_code_name
+        tests:
+          - not_null
+
+  - name: dim_date
+    description: "Calendar dimension covering the date range of the taxi trip dataset."
+    columns:
+      - name: date_key
+        tests:
+          - unique
+          - not_null
+
+      - name: full_date
+        tests:
+          - unique
+          - not_null
+
+      - name: year
+        tests:
+          - not_null
+
+      - name: month
+        tests:
+          - not_null
+
+      - name: month_name
+        tests:
+          - not_null
+
+      - name: quarter
+        tests:
+          - not_null
+
+      - name: is_weekend
+        tests:
+          - not_null
