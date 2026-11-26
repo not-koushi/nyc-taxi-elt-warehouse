@@ -28,13 +28,12 @@ BATCH_SIZE = 100_000
 SOURCE_FILE = os.path.basename(DATA_FILE)
 
 DB_CONFIG = {
-    "host": "localhost",
+    "host": os.getenv("DB_HOST", "localhost"),
     "port": os.getenv("POSTGRES_PORT", "5432"),
     "dbname": os.getenv("POSTGRES_DB", "taxi_warehouse"),
     "user": "taxi_ingest",
     "password": os.getenv("TAXI_INGEST_PASSWORD"),
 }
-
 
 SOURCE_COLUMNS = [
     "VendorID",
