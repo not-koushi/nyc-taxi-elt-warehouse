@@ -50,3 +50,10 @@ airflow/plugins/__pycache__/
 
 # Docker
 *.pid
+
+# Airflow runtime logs
+logs/
+
+# Generated quality audit artifacts
+reports/quality/audit_*.json
+reports/quality/report_*.md
