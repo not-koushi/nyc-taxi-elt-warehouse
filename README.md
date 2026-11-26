@@ -130,7 +130,7 @@ Apache Airflow orchestrates the pipeline through a manually triggered DAG.
 Tasks execute sequentially, with downstream tasks dependent on the successful completion of upstream tasks.
 
 
-![Successful DAG](docs/iamges/airflow-dag-success.png)
+![Successful DAG](docs/images/airflow-dag-success.png)
 
 ---
 
