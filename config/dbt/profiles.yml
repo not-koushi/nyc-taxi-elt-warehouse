@@ -1,0 +1,13 @@
+nyc_taxi_warehouse:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('DB_HOST', 'warehouse') }}"
+      port: "{{ env_var('DB_PORT', '5432') | int }}"
+      user: "{{ env_var('DBT_USER', 'taxi_transform') }}"
+      password: "{{ env_var('DBT_PASSWORD') }}"
+      dbname: "{{ env_var('DB_NAME', 'taxi_warehouse') }}"
+      schema: dbt_dev
+      threads: 4
+      connect_timeout: 10

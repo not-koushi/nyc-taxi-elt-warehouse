@@ -1,5 +1,3 @@
 psycopg2-binary
-python-dotenv
 pyarrow
-dbt-core
-dbt-postgres
+python-dotenv
