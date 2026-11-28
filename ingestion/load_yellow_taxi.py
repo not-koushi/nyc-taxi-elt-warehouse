@@ -2,17 +2,19 @@ import csv
 import io
 import logging
 import os
+import re
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
+from pathlib import Path
 
 import psycopg2
 import pyarrow.parquet as pq
 from dotenv import load_dotenv
 
 from ingestion.validation import (
-    validate_source_file,
     validate_batch,
     validate_loaded_rows,
+    validate_source_file,
 )
 
 # --------------------------------------------------
@@ -21,11 +23,8 @@ from ingestion.validation import (
 
 load_dotenv()
 
-DATA_FILE = "data/raw/yellow_tripdata_2025-01.parquet"
-SOURCE_MONTH = "2025-01-01"
+DATA_DIR = Path("data/raw")
 BATCH_SIZE = 100_000
-
-SOURCE_FILE = os.path.basename(DATA_FILE)
 
 DB_CONFIG = {
     "host": os.getenv("DB_HOST", "localhost"),
@@ -58,7 +57,6 @@ SOURCE_COLUMNS = [
     "cbd_congestion_fee",
 ]
 
-
 # --------------------------------------------------
 # LOGGING
 # --------------------------------------------------
@@ -69,6 +67,62 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+
+# --------------------------------------------------
+# SOURCE DISCOVERY
+# --------------------------------------------------
+
+def extract_source_month(source_file):
+    """
+    Extract the source month from a TLC Yellow Taxi filename.
+
+    Expected format:
+    yellow_tripdata_YYYY-MM.parquet
+    """
+
+    match = re.fullmatch(
+        r"yellow_tripdata_(\d{4})-(\d{2})\.parquet",
+        os.path.basename(str(source_file)),
+    )
+
+    if not match:
+        raise ValueError(
+            f"Invalid source filename format: {source_file}"
+        )
+
+    year, month = map(int, match.groups())
+
+    if not 1 <= month <= 12:
+        raise ValueError(
+            f"Invalid source month in filename: {source_file}"
+        )
+
+    return f"{year:04d}-{month:02d}-01"
+
+
+def discover_source_files(data_dir=DATA_DIR):
+    """
+    Discover monthly Yellow Taxi Parquet files.
+
+    Files are returned in sorted order.
+    """
+
+    data_dir = Path(data_dir)
+
+    if not data_dir.exists():
+        raise FileNotFoundError(
+            f"Source directory does not exist: {data_dir}"
+        )
+
+    files = sorted(
+        data_dir.glob("yellow_tripdata_*.parquet")
+    )
+
+    # Validate filenames before processing.
+    for file_path in files:
+        extract_source_month(file_path.name)
+
+    return files
 
 
 # --------------------------------------------------
@@ -88,9 +142,15 @@ def convert_value(value):
     return str(value)
 
 
-def create_batch_buffer(batch, source_file, ingested_at, batch_id):
+def create_batch_buffer(
+    batch,
+    source_month,
+    source_file,
+    ingested_at,
+    batch_id,
+):
     """
-    Convert one Arrow batch into a CSV buffer
+    Convert an Arrow batch into a CSV buffer
     suitable for PostgreSQL COPY.
     """
 
@@ -113,7 +173,7 @@ def create_batch_buffer(batch, source_file, ingested_at, batch_id):
             values.append(convert_value(value))
 
         values.extend([
-            SOURCE_MONTH,
+            source_month,
             source_file,
             ingested_at,
             batch_id,
@@ -158,10 +218,18 @@ def delete_previous_source_data(cursor, source_file):
     )
 
 
-def load_batch(cursor, batch, source_file, ingested_at, batch_id):
+def load_batch(
+    cursor,
+    batch,
+    source_month,
+    source_file,
+    ingested_at,
+    batch_id,
+):
 
     buffer = create_batch_buffer(
         batch=batch,
+        source_month=source_month,
         source_file=source_file,
         ingested_at=ingested_at,
         batch_id=batch_id,
@@ -205,17 +273,25 @@ def load_batch(cursor, batch, source_file, ingested_at, batch_id):
 
 
 # --------------------------------------------------
-# PIPELINE
+# SINGLE-FILE PIPELINE
 # --------------------------------------------------
 
-def main():
+def load_file(data_file):
 
-    source_validation = validate_source_file(DATA_FILE)
+    data_file = Path(data_file)
+    source_file = data_file.name
+    source_month = extract_source_month(source_file)
 
-    logger.info("Starting ingestion pipeline")
-    logger.info("Source file: %s", SOURCE_FILE)
+    source_validation = validate_source_file(data_file)
 
-    parquet_file = pq.ParquetFile(DATA_FILE)
+    logger.info("----------------------------------")
+    logger.info("Starting file ingestion")
+    logger.info("Source file: %s", source_file)
+    logger.info("Source month: %s", source_month)
+    logger.info("Source rows: %s", source_validation["row_count"])
+    logger.info("----------------------------------")
+
+    parquet_file = pq.ParquetFile(data_file)
 
     total_rows = source_validation["row_count"]
     total_loaded = 0
@@ -224,7 +300,7 @@ def main():
     ingestion_id = str(uuid.uuid4())
     batch_id = str(uuid.uuid4())
 
-    started_at = datetime.now(timezone.utc)
+    started_at = datetime.now(UTC)
     ingested_at = started_at.isoformat()
 
     connection = psycopg2.connect(**DB_CONFIG)
@@ -237,31 +313,31 @@ def main():
             # IDEMPOTENCY CHECK
             # --------------------------------------------------
 
-            if file_already_ingested(cursor, SOURCE_FILE):
+            if file_already_ingested(cursor, source_file):
 
                 logger.info(
-                    "Source file has already been successfully ingested."
+                    "File already successfully ingested: %s",
+                    source_file,
                 )
 
-                logger.info("Skipping ingestion.")
-                return
+                logger.info("Skipping file.")
+                return "SKIPPED"
 
             # --------------------------------------------------
             # TRANSACTION START
             # --------------------------------------------------
 
             logger.info(
-                "Beginning transaction for source file."
+                "Beginning transaction for %s",
+                source_file,
             )
 
-            # The first implementation loaded this file without
-            # a tracking entry. Remove those legacy rows as part
-            # of this transaction before performing the new load.
-            logger.info(
-                "Removing existing rows for this source file, if any."
+            # Replace legacy or incomplete data for this file
+            # inside the transaction.
+            delete_previous_source_data(
+                cursor,
+                source_file,
             )
-
-            delete_previous_source_data(cursor, SOURCE_FILE)
 
             # --------------------------------------------------
             # TRACKING RECORD
@@ -288,8 +364,8 @@ def main():
                 """,
                 (
                     ingestion_id,
-                    SOURCE_FILE,
-                    SOURCE_MONTH,
+                    source_file,
+                    source_month,
                     started_at,
                 ),
             )
@@ -317,7 +393,8 @@ def main():
                 load_batch(
                     cursor=cursor,
                     batch=batch,
-                    source_file=SOURCE_FILE,
+                    source_month=source_month,
+                    source_file=source_file,
                     ingested_at=ingested_at,
                     batch_id=batch_id,
                 )
@@ -331,7 +408,7 @@ def main():
                 )
 
             # --------------------------------------------------
-            # MARK SUCCESS
+            # ROW COUNT VALIDATION
             # --------------------------------------------------
 
             validate_loaded_rows(
@@ -339,7 +416,11 @@ def main():
                 loaded_rows=total_loaded,
             )
 
-            completed_at = datetime.now(timezone.utc)
+            # --------------------------------------------------
+            # MARK SUCCESS
+            # --------------------------------------------------
+
+            completed_at = datetime.now(UTC)
 
             cursor.execute(
                 """
@@ -358,26 +439,32 @@ def main():
                 ),
             )
 
-        # Commit the data and tracking record together.
+        # Data and successful tracking record
+        # commit together.
         connection.commit()
 
         logger.info("----------------------------------")
         logger.info("INGESTION SUCCESSFUL")
+        logger.info("Source file: %s", source_file)
         logger.info("Rows loaded: %s", total_loaded)
         logger.info("Batches loaded: %s", total_batches)
         logger.info("Ingestion ID: %s", ingestion_id)
         logger.info("Batch ID: %s", batch_id)
         logger.info("----------------------------------")
 
+        return "SUCCESS"
+
     except Exception as error:
 
-        # Roll back the data and RUNNING record together.
+        # Roll back source data and RUNNING record.
         connection.rollback()
 
-        logger.exception("Ingestion failed.")
+        logger.exception(
+            "Ingestion failed for %s",
+            source_file,
+        )
 
-        # Record failure independently, outside the rolled-back
-        # transaction, so failure information is preserved.
+        # Record failure independently.
         try:
 
             with connection.cursor() as cursor:
@@ -407,10 +494,10 @@ def main():
                     """,
                     (
                         ingestion_id,
-                        SOURCE_FILE,
-                        SOURCE_MONTH,
+                        source_file,
+                        source_month,
                         started_at,
-                        datetime.now(timezone.utc),
+                        datetime.now(UTC),
                         total_loaded,
                         str(error)[:4000],
                     ),
@@ -431,6 +518,72 @@ def main():
     finally:
 
         connection.close()
+
+
+# --------------------------------------------------
+# MULTI-FILE PIPELINE
+# --------------------------------------------------
+
+def main():
+
+    source_files = discover_source_files(DATA_DIR)
+
+    if not source_files:
+
+        logger.warning(
+            "No Yellow Taxi Parquet files found in %s",
+            DATA_DIR,
+        )
+
+        return
+
+    logger.info(
+        "Discovered %s source file(s).",
+        len(source_files),
+    )
+
+    results = {
+        "SUCCESS": 0,
+        "SKIPPED": 0,
+        "FAILED": 0,
+    }
+
+    for data_file in source_files:
+
+        logger.info(
+            "Processing %s",
+            data_file.name,
+        )
+
+        try:
+
+            result = load_file(data_file)
+            results[result] += 1
+
+        except Exception:
+
+            results["FAILED"] += 1
+
+            logger.exception(
+                "Failed to process file: %s",
+                data_file.name,
+            )
+
+            # Continue processing other files.
+            # A failed monthly file does not prevent
+            # subsequent files from being processed.
+
+    logger.info("----------------------------------")
+    logger.info("MULTI-FILE INGESTION SUMMARY")
+    logger.info("Successful: %s", results["SUCCESS"])
+    logger.info("Skipped: %s", results["SKIPPED"])
+    logger.info("Failed: %s", results["FAILED"])
+    logger.info("----------------------------------")
+
+    if results["FAILED"] > 0:
+        raise RuntimeError(
+            f"{results['FAILED']} source file(s) failed ingestion."
+        )
 
 
 # --------------------------------------------------

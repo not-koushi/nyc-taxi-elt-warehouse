@@ -2,7 +2,6 @@
 
 import json
 from pathlib import Path
-from datetime import datetime
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
 REPORT_DIR = ROOT_DIR / "reports" / "quality"
@@ -57,8 +56,8 @@ lines = [
     "- WARN = 0.5 points",
     "- FAIL = 0 points",
     "",
-    "This is a check-level monitoring score, not a measure of "
-    "the percentage of individual records that are valid.",
+    ("This is a check-level monitoring score, not a measure of "
+    "the percentage of individual records that are valid."),
     "",
     "## Detailed Results",
     "",
@@ -147,9 +146,9 @@ lines.extend([
     "",
     "## Interpretation",
     "",
-    "Warnings do not necessarily represent invalid records. "
+    ("Warnings do not necessarily represent invalid records. "
     "They may indicate legitimate source-data conditions, "
-    "unusual observations, or classification limitations.",
+    "unusual observations, or classification limitations."),
     "",
     "This audit does not automatically remove or modify records.",
     "",

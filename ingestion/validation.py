@@ -3,7 +3,6 @@ from pathlib import Path
 
 import pyarrow.parquet as pq
 
-
 logger = logging.getLogger(__name__)
 
 

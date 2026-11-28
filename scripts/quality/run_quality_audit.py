@@ -1,15 +1,13 @@
 #!/usr/bin/env python3
 
+import json
 import os
 import sys
-import json
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 
 import psycopg2
-from psycopg2.extras import RealDictCursor
-
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
 
@@ -467,7 +465,7 @@ def run_audit():
 
     summary = {
         "audit_run_id": AUDIT_RUN_ID,
-        "executed_at": datetime.now(timezone.utc).isoformat(),
+        "executed_at": datetime.now(UTC).isoformat(),
         "total_checks": len(results),
         "pass": sum(r["status"] == "PASS" for r in results),
         "warn": sum(r["status"] == "WARN" for r in results),

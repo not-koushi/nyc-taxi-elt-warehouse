@@ -1,14 +1,13 @@
-import pytest
 import pyarrow as pa
 import pyarrow.parquet as pq
+import pytest
 
 from ingestion.validation import (
     EXPECTED_COLUMNS,
-    validate_source_file,
     validate_batch,
     validate_loaded_rows,
+    validate_source_file,
 )
-
 
 # --------------------------------------------------
 # TEST: VALID PARQUET FILE
